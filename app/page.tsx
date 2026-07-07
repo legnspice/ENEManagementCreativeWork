@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import { SimulatorProvider } from "./_sim/SimulatorProvider";
+import { Simulator } from "./_sim/Simulator";
 
 export default function HomePage() {
-  redirect("/feed/search?query=%23YaniDrama");
+  return (
+    <SimulatorProvider>
+      <Simulator />
+    </SimulatorProvider>
+  );
 }

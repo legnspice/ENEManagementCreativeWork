@@ -1,14 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #000000;
-  --bg-elevated: #16181c;
-  --border: #2f3336;
-  --text: #e7e9ea;
-  --text-muted: #71767b;
-  --accent: #1d9bf0;
-  --accent-hover: #1a8cd8;
-  --danger: #f4212e;
+  /* Platform feed (legacy /feed) — readable on a light UI */
+  --bg: #ffffff;
+  --bg-elevated: #eef2f7;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --danger: #dc2626;
+
+  /* Moderation console — light corporate SaaS */
+  --console: #eef2f7; /* page backdrop */
+  --panel: #ffffff; /* cards */
+  --panel-2: #f4f7fb; /* nested surfaces */
+  --hairline: #e4e9f1; /* borders */
+  --warning: #b45309; /* Flag / amber */
+  --success: #15803d; /* correct / approve */
+  --money: #047857; /* wage counter */
+  --brand: #2563eb; /* corporate accent */
+  --brand-2: #4f46e5; /* gradient partner */
+
+  /* Deterioration: 0 = fresh, 1 = fully worn. Set inline on the shift root. */
+  --toll: 0;
 }
 
 @theme inline {
@@ -19,12 +34,23 @@
   --color-text-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-danger: var(--danger);
+
+  --color-console: var(--console);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-hairline: var(--hairline);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
+  --color-money: var(--money);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 html, body {
-  background: var(--bg);
+  background: var(--console);
   color: var(--text);
 }
 
@@ -32,6 +58,109 @@ body {
   font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* ---------- Animations ---------- */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes float-up {
+  0% { opacity: 0; transform: translateY(6px) scale(0.9); }
+  20% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-22px) scale(1); }
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@keyframes pulse-danger {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -3%); }
+  75% { transform: translate(-2%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes intrusion-in {
+  from { opacity: 0; filter: blur(14px) saturate(0); }
+  to { opacity: 1; filter: blur(0) saturate(0.25); }
+}
+@keyframes sheen {
+  from { background-position: -150% 0; }
+  to { background-position: 250% 0; }
+}
+
+/* ---------- Utilities ---------- */
+.anim-fade { animation: fade-in 0.35s ease both; }
+.anim-rise { animation: rise-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-scale { animation: scale-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-float { animation: float-up 1s ease-out both; }
+.anim-pop { animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1); display: inline-block; }
+.pulse-danger { animation: pulse-danger 1s ease-in-out infinite; }
+
+/* Film-grain overlay — used on the DARK intrusion overlays only */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.12;
+  pointer-events: none;
+  animation: grain-shift 0.6s steps(3) infinite;
+  mix-blend-mode: overlay;
+}
+
+/* The moderation frame — a clean card that quietly gets grimy as the shift wears on */
+.monitor { position: relative; }
+.monitor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(30, 41, 59, calc(var(--toll) * 0.05));
+  box-shadow: inset 0 0 80px rgba(30, 41, 59, calc(var(--toll) * 0.10));
+}
+
+/* Deterioration: color drains from the console as the shift goes on */
+.deteriorate {
+  filter: saturate(calc(1 - var(--toll) * 0.55)) brightness(calc(1 - var(--toll) * 0.04));
+  transition: filter 1.2s linear;
+}
+
+.gradient-text {
+  background: linear-gradient(92deg, var(--brand), var(--brand-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sheen {
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: sheen 2.4s ease-in-out infinite;
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+.frame-scroll { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.frame-scroll::-webkit-scrollbar { width: 8px; }
+.frame-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+.frame-scroll::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .grain::before { animation: none; }
 }
