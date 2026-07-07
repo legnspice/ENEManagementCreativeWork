@@ -66,9 +66,6 @@ export function Shift() {
                       </div>
                     </div>
                   ) : null}
-                  <div className="px-4 pb-6 pt-2 text-center text-[11px] text-text-muted">
-                    — end of post · make your call —
-                  </div>
                 </div>
               ) : (
                 <div className="grid h-full place-items-center p-8 text-sm text-text-muted">

@@ -5,7 +5,8 @@ import {
   pickBleedThrough,
   shouldReprimand,
   pickReprimand,
-  INITIAL_LAST_DEVICE_ELAPSED,
+  INITIAL_LAST_BLEED_INDEX,
+  INITIAL_LAST_REPRIMAND_INDEX,
 } from "./devices";
 
 /** Fisher–Yates shuffle (new array). Runs only on START_SHIFT — a client-only,
@@ -36,7 +37,8 @@ export function initialState(queue: QueueItem[]): State {
     pendingDevice: null,
     feedback: null,
     tutorialOpen: false,
-    lastDeviceElapsed: INITIAL_LAST_DEVICE_ELAPSED,
+    lastBleedIndex: INITIAL_LAST_BLEED_INDEX,
+    lastReprimandIndex: INITIAL_LAST_REPRIMAND_INDEX,
     bleedFired: 0,
     reprimandFired: 0,
     ended: null,
@@ -125,7 +127,8 @@ export function reducer(state: State, action: Action): State {
           ...cleared,
           activeDevice: device,
           pendingDevice: null,
-          lastDeviceElapsed: state.duration - state.remaining,
+          lastBleedIndex: device.kind === "bleedthrough" ? state.index : state.lastBleedIndex,
+          lastReprimandIndex: device.kind === "reprimand" ? state.index : state.lastReprimandIndex,
           bleedFired: state.bleedFired + (device.kind === "bleedthrough" ? 1 : 0),
           reprimandFired: state.reprimandFired + (device.kind === "reprimand" ? 1 : 0),
         };

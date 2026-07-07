@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSim } from "../SimulatorProvider";
 import { BRAND } from "../brand";
+import { Logo } from "../components/Logo";
 
 export function SignIn() {
   const { dispatch } = useSim();
@@ -27,9 +28,7 @@ export function SignIn() {
 
       <div className="anim-rise relative w-full max-w-sm">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-brand to-brand-2 text-2xl font-black text-white shadow-lg shadow-brand/20">
-            {BRAND.initial}
-          </div>
+          <Logo className="mx-auto h-8 w-8" />
           <h1 className="text-xl font-bold text-text">{BRAND.name}</h1>
           <p className="mt-1 text-sm text-text-muted">
             {BRAND.unit} — {BRAND.site}

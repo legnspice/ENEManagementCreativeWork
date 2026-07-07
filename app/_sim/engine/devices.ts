@@ -1,28 +1,25 @@
 import type { State, QueueItem, BleedThrough, Reprimand } from "./types";
 import { BLEEDTHROUGHS, REPRIMANDS } from "../content/devices";
 
-// Devices are gated by TIME so they spread across the whole 5-minute shift
-// instead of clustering early — a couple of moments, well apart.
-export const MAX_BLEED = 3;
-export const MAX_REPRIMAND = 2;
-const MIN_GAP_SEC = 80; // minimum seconds between any two devices
-const FIRST_DEVICE_AFTER_SEC = 40; // nothing intrudes in the opening stretch
+// Devices are gated by POST NUMBER so they stay spread out and predictable:
+// nothing in the opening posts, and a minimum number of posts between any two.
+export const MAX_BLEED = 3; // stills stay rare
+export const MAX_REPRIMAND = 4; // Simon can nag more often
+const BLEED_MIN_GAP = 6; // posts between the (rare) stills
+const REPRIMAND_MIN_GAP = 3; // Simon can come back sooner
+const FIRST_BLEED_AFTER_POST = 4; // 0-indexed: no still before the 5th post
+const FIRST_REPRIMAND_AFTER_POST = 2; // Simon can start a little earlier
 
-/** Initial value so the first device becomes eligible at FIRST_DEVICE_AFTER_SEC. */
-export const INITIAL_LAST_DEVICE_ELAPSED = FIRST_DEVICE_AFTER_SEC - MIN_GAP_SEC;
+/** Initial values so each device's first fire lands after its "first after" post. */
+export const INITIAL_LAST_BLEED_INDEX = FIRST_BLEED_AFTER_POST - BLEED_MIN_GAP;
+export const INITIAL_LAST_REPRIMAND_INDEX = FIRST_REPRIMAND_AFTER_POST - REPRIMAND_MIN_GAP;
 
-function elapsed(state: State): number {
-  return state.duration - state.remaining;
-}
-function longEnoughSinceLastDevice(state: State): boolean {
-  return elapsed(state) - state.lastDeviceElapsed >= MIN_GAP_SEC;
-}
-
-/** Bleed-through fires on a heavy item, at most a couple times, well spaced. */
+/** Bleed-through fires on a heavy item, at most a few times, well spaced by post.
+ *  Spacing is tracked independently, so Simon's reprimands can never delay a still. */
 export function shouldBleedThrough(state: State, item: QueueItem): boolean {
   if (!item.heavy) return false;
   if (state.bleedFired >= MAX_BLEED) return false;
-  return longEnoughSinceLastDevice(state);
+  return state.index - state.lastBleedIndex >= BLEED_MIN_GAP;
 }
 
 export function pickBleedThrough(firedCount: number): BleedThrough | null {
@@ -30,15 +27,16 @@ export function pickBleedThrough(firedCount: number): BleedThrough | null {
   return BLEEDTHROUGHS[firedCount % BLEEDTHROUGHS.length];
 }
 
-/** Reprimand on a real error streak or clearly behind pace — rare + spaced. */
+/** Reprimand on a real error streak — rare + spaced by post. */
 export function shouldReprimand(state: State): boolean {
   if (state.reprimandFired >= MAX_REPRIMAND) return false;
-  if (!longEnoughSinceLastDevice(state)) return false;
+  if (state.index - state.lastReprimandIndex < REPRIMAND_MIN_GAP) return false;
+  // Simon chimes in on any recent miss OR when you're dragging behind pace.
+  const madeMistake = state.wrongStreak >= 1;
   const processed = state.index + 1;
-  const expected = Math.floor(elapsed(state) / 12); // lenient pace
-  const behindPace = processed < expected - 2;
-  const errorStreak = state.wrongStreak >= 3;
-  return behindPace || errorStreak;
+  const expectedByNow = Math.floor((state.duration - state.remaining) / 12); // ~1 per 12s
+  const behindPace = processed < expectedByNow - 1;
+  return madeMistake || behindPace;
 }
 
 export function pickReprimand(state: State): Reprimand | null {

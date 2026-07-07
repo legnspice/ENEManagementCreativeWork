@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSim } from "../SimulatorProvider";
 import { ECONOMY, formatPeso, formatClock } from "../engine/scoring";
 import { BRAND } from "../brand";
+import { Logo } from "./Logo";
 
 function Stat({
   label,
@@ -45,9 +46,7 @@ export function Hud() {
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-2.5">
         {/* Brand */}
         <div className="flex items-center gap-2">
-          <div className="grid h-7 w-7 place-items-center rounded-md bg-gradient-to-br from-brand to-brand-2 text-sm font-black text-white">
-            {BRAND.initial}
-          </div>
+          <Logo className="h-7 w-7" />
           <div className="hidden sm:block leading-none">
             <div className="text-sm font-bold text-text">{BRAND.name}</div>
             <div className="text-[10px] uppercase tracking-[0.14em] text-text-muted">

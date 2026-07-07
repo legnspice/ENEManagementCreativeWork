@@ -21,8 +21,10 @@ export function DeviceImage({
   const [failed, setFailed] = useState(false);
   const showPlaceholder = !src || failed;
 
+  // NOTE: the caller supplies the positioning (e.g. `absolute inset-0`). Don't hardcode
+  // `relative` here — it collapses the box and hides the fill image.
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`overflow-hidden ${className}`}>
       {showPlaceholder ? (
         <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#0d1117] via-[#161b22] to-[#05070a]">
           <div className="flex flex-col items-center gap-2 opacity-60">

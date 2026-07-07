@@ -11,14 +11,12 @@ export function BleedThrough({ data }: { data: BleedData }) {
   const level = deviceLevel(state);
   const [canContinue, setCanContinue] = useState(false);
 
-  // A forced beat: you can't dismiss it immediately. Longer as the shift wears on.
-  const hold = level === 1 ? 900 : level === 2 ? 1300 : 1700;
-
+  // A forced beat: sit with the image for 3s, then the way out fades in.
   useEffect(() => {
     setCanContinue(false);
-    const t = setTimeout(() => setCanContinue(true), hold);
+    const t = setTimeout(() => setCanContinue(true), 3000);
     return () => clearTimeout(t);
-  }, [data.id, hold]);
+  }, [data.id]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -44,43 +42,20 @@ export function BleedThrough({ data }: { data: BleedData }) {
       <DeviceImage
         src={data.media}
         alt={data.alt}
-        caption={data.timestamp}
         className="absolute inset-0 opacity-70"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60" />
 
-      <div className="relative z-10 flex max-w-lg flex-col items-center px-6 text-center">
-        {data.fragment && (
-          <p
-            className="text-xl font-light italic leading-relaxed text-white/90 sm:text-2xl"
-            style={{ textShadow: "0 2px 20px rgba(0,0,0,0.9)", animation: "fade-in 1.2s ease both" }}
+      {/* skip-style prompt, below the midline */}
+      <div className="absolute inset-x-0 bottom-[16%] z-10 flex justify-center px-6">
+        {canContinue && (
+          <button
+            type="button"
+            onClick={() => dispatch({ type: "DISMISS_DEVICE" })}
+            className="anim-fade cursor-pointer rounded-full border border-white/40 px-6 py-2.5 text-sm font-semibold text-white/90 transition hover:bg-white/10"
           >
-            {data.fragment}
-          </p>
-        )}
-        {data.timestamp && (
-          <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-white/40">
-            {data.timestamp}
-          </p>
-        )}
-
-        <button
-          type="button"
-          disabled={!canContinue}
-          onClick={() => dispatch({ type: "DISMISS_DEVICE" })}
-          className={`mt-8 rounded-full border px-6 py-2.5 text-sm font-semibold transition
-            ${
-              canContinue
-                ? "anim-fade cursor-pointer border-white/40 text-white hover:bg-white/10"
-                : "cursor-not-allowed border-white/10 text-white/20"
-            }`}
-        >
-          Keep working
-        </button>
-        {!canContinue && (
-          <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-white/25">
-            the clock is still running
-          </p>
+            Keep working →
+          </button>
         )}
       </div>
     </div>

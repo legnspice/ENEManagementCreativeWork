@@ -97,8 +97,9 @@ export type State = {
   pendingDevice: DeviceItem | null;
   feedback: Feedback | null;
   tutorialOpen: boolean;
-  /** device throttling (time-based) */
-  lastDeviceElapsed: number; // seconds into the shift when the last device fired
+  /** device throttling (post-based, tracked separately so Simon never starves the stills) */
+  lastBleedIndex: number;
+  lastReprimandIndex: number;
   bleedFired: number;
   reprimandFired: number;
   ended: "time" | "queue" | null;

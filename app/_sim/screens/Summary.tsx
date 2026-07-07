@@ -69,13 +69,13 @@ export function Summary() {
           <p>
             That&apos;s what Deleter (2022) is about. It keeps you inside Lyra&apos;s head as the
             job wears her down, and when she&apos;s barely holding on, her boss just hands her anxiety
-            pills instead of actually helping. The point isn&apos;t that she&apos;s weak; it&apos;s a
-            company that chose profit and quotas over the people doing the work.
+            pills instead of actually helping. The point isn&apos;t that she&apos;s weak; it&apos;s that a
+            company is prioritizing profit and quotas over the people doing the actual work.
           </p>
           <p className="font-semibold">
             87% of Filipino workers say their job has affected their mental health. Behind every clean
             feed is a real person absorbing the violence so you don&apos;t have to, and with proper
-            support, none of it has to be this way. That&apos;s a choice the people in power keep
+            support, none of it has to be this way. This is just a choice the people in power keep
             making.
           </p>
         </div>
