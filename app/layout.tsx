@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Putting on the Mask · SocHub Moderation Console",
+  title: "SocHub",
   description:
     "An interactive content-moderation shift. A Group 5 creative output on labor in content moderation, after Mikhail Red's Deleter (2022).",
   icons: { icon: "/logo/sochub.png" },
